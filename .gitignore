@@ -1,0 +1,2 @@
+#  Ignore the virtual environment that was built to develop this project.
+/djangovenv/*
