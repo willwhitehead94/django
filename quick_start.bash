@@ -1,0 +1,1 @@
+cd ~/Documents/GitHub/django/;source djangovenv/bin/activate; echo 'Packt Learning Course - Django Projects.'

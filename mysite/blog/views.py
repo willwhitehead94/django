@@ -3,6 +3,8 @@ from .models import Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView  # Used for class-based views (Django specific)
 from .forms import EmailPostForm
+from django.core.mail import send_mail  # Used to sent data to somebody via the view (Page 44).
+
 
 # Create your views here.
 def post_list(request):
@@ -39,11 +41,16 @@ class PostListView(ListView):
 
 def post_share(request, post_id):
     # Retrieve a post by its ID.
-    post = get_object_or_404(Post, id=post_id, status='Published')
+    post = get_object_or_404(Post, id=post_id, status='published')
+    sent = False
     if request.method == 'Post':
         form = EmailPostForm(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
+            post_url = request.build_absolute_uri(post.get_absolute_url())
+            subject = f"{cleaned_data['name']} recommends you read {post.title}!"
+            message = f"Read {post.title} by clicking here, or visiting {post_url}.\n\n{cleaned_data['name']} said {cleaned_data['comment']}!"
+            send_mail(subject,message,'will@littleoxfordstreet.com', [cleaned_data['to']])
             #... send email
         else:
             print(f'Form contained validation issues: {form.errors}')
