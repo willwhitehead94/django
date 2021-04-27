@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Post
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView  # Used for class-based views (Django specific)
-
+from .forms import EmailPostForm
 
 # Create your views here.
 def post_list(request):
@@ -36,4 +36,19 @@ class PostListView(ListView):
     context_object_name = 'posts' # This would default to object_list if we didn't define a context here.
     paginate_by = 3
     template_name = 'blog/post/list.html'
+
+def post_share(request, post_id):
+    # Retrieve a post by its ID.
+    post = get_object_or_404(Post, id=post_id, status='Published')
+    if request.method == 'Post':
+        form = EmailPostForm(request.POST)
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+            #... send email
+        else:
+            print(f'Form contained validation issues: {form.errors}')
+    else:
+        form = EmailPostForm()
+        
+    return render(request, 'blog/post/share.html', {'post':post, 'form': form})
 
