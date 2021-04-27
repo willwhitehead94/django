@@ -32,6 +32,8 @@ def post_detail(request, year, month, day, post):
 # Class-based views, as opposed to functional views as above.
 class PostListView(ListView):
     queryset = Post.published.all()
-    ontext_object_name = 'posts'
+    # model = Post #  Use this if you want Django to generate it's own object.all() view.
+    context_object_name = 'posts' # This would default to object_list if we didn't define a context here.
     paginate_by = 3
     template_name = 'blog/post/list.html'
+
