@@ -43,7 +43,7 @@ def post_share(request, post_id):
     # Retrieve a post by its ID.
     post = get_object_or_404(Post, id=post_id, status='published')
     sent = False
-    if request.method == 'Post':
+    if request.method == 'POST':
         form = EmailPostForm(request.POST)
         if form.is_valid():
             cleaned_data = form.cleaned_data
@@ -51,11 +51,12 @@ def post_share(request, post_id):
             subject = f"{cleaned_data['name']} recommends you read {post.title}!"
             message = f"Read {post.title} by clicking here, or visiting {post_url}.\n\n{cleaned_data['name']} said {cleaned_data['comment']}!"
             send_mail(subject,message,'will@littleoxfordstreet.com', [cleaned_data['to']])
-            #... send email
+            
+            sent = True
         else:
             print(f'Form contained validation issues: {form.errors}')
     else:
         form = EmailPostForm()
         
-    return render(request, 'blog/post/share.html', {'post':post, 'form': form})
+    return render(request, 'blog/post/share.html', {'post':post, 'form': form, 'sent':sent})
 
