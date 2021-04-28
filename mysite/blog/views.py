@@ -4,12 +4,20 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView  # Used for class-based views (Django specific)
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail  # Used to sent data to somebody via the view (Page 44).
+from taggit.models import Tag  # The taggable manager to allow us to list the tags next to each post (Page 61).
 
 
 # Create your views here.
-def post_list(request):
+def post_list(request, tag_slug=None):
     # posts = Post.published.all()
     object_list = Post.published.all()
+    
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        print(f'Demo - TAG SLUG:{tag_slug}!')
+        object_list = object_list.filter(tags__in=[tag])
+
     paginator = Paginator(object_list, 3)  # Cap the number of posts per page at 3.
     page = request.GET.get('page')
     try:
@@ -18,7 +26,8 @@ def post_list(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
+    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts,
+                                                    'tag': tag})
 
     # return render(request, 'blog/post/list.html', {'posts': posts})
 
