@@ -4,12 +4,20 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView  # Used for class-based views (Django specific)
 from .forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail  # Used to sent data to somebody via the view (Page 44).
-
+from taggit.models import Tag  # The taggable manager to allow us to list the tags next to each post (Page 61).
+from django.db.models import Count  # Used to start to recommend similar articles. The Count module contains the aggregations, such as Avg, Max, Min etc. (Page 64)
 
 # Create your views here.
-def post_list(request):
+def post_list(request, tag_slug=None):
     # posts = Post.published.all()
     object_list = Post.published.all()
+    
+    tag = None
+    if tag_slug:
+        tag = get_object_or_404(Tag, slug=tag_slug)
+        print(f'Demo - TAG SLUG:{tag_slug}!')
+        object_list = object_list.filter(tags__in=[tag])
+
     paginator = Paginator(object_list, 3)  # Cap the number of posts per page at 3.
     page = request.GET.get('page')
     try:
@@ -18,7 +26,8 @@ def post_list(request):
         posts = paginator.page(1)
     except EmptyPage:
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts})
+    return render(request, 'blog/post/list.html', {'page': page, 'posts': posts,
+                                                    'tag': tag})
 
     # return render(request, 'blog/post/list.html', {'posts': posts})
 
@@ -45,10 +54,16 @@ def post_detail(request, year, month, day, post):
         else:
             comment_form = CommentForm()
 
+    # Similar posts
+    post_tags_ids = post.tags.values_list('id', flat=True)
+    similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', '-publish')[:4]
+
     return render(request, 'blog/post/detail.html', {'post': post,
                                                     'comments': comments,
                                                     'new_comment': new_comment,
-                                                    'comment_form': comment_form
+                                                    'comment_form': comment_form,
+                                                    'similar_posts': similar_posts
                                                     })
 
 # Class-based views, as opposed to functional views as above.
