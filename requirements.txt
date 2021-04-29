@@ -1,3 +1,5 @@
+psycopg2-binary==2.8.4
+six==1.15.0
 asgiref==3.3.4
 Django==3.0.14
 django-taggit==1.2.0
