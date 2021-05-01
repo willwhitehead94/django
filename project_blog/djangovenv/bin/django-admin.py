@@ -1,4 +1,4 @@
-#!/Users/willwhitehead/Documents/GitHub/django/djangovenv/bin/python3
+#!/Users/willwhitehead/Documents/GitHub/django/project_blog/djangovenv/bin/python3
 from django.core import management
 
 if __name__ == "__main__":
