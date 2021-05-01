@@ -6,7 +6,8 @@ from .forms import EmailPostForm, CommentForm, SearchForm
 from django.core.mail import send_mail  # Used to sent data to somebody via the view (Page 44).
 from taggit.models import Tag  # The taggable manager to allow us to list the tags next to each post (Page 61).
 from django.db.models import Count  # Used to start to recommend similar articles. The Count module contains the aggregations, such as Avg, Max, Min etc. (Page 64)
-from django.contrib.postgres.search import SearchVector  # Used to search across fields.
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank  # Used to search across fields.
+
 
 # Create your views here.
 def post_list(request, tag_slug=None):
@@ -105,9 +106,12 @@ def post_search(request):
         form = SearchForm(request.GET)
         if form.is_valid():
             query = form.cleaned_data['query']
+            search_vector = SearchVector('title', 'body')
+            search_query = SearchQuery(query)
             results = Post.published.annotate(
-                search = SearchVector('title','body'),
-            ).filter(search=query)
+                search = search_vector,
+                rank=SearchRank(search_vector, search_query)
+            ).filter(search=search_query).order_by('-rank')
     return render(request,
                 'blog/post/search.html',
                 {'form':form, 'query':query, 'results':results}
