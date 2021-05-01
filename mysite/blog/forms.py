@@ -15,3 +15,7 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ('name', 'email', 'body')
         exclude = ('active',)
+
+class SearchForm(forms.Form):
+    query = forms.CharField()
+    
