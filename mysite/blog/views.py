@@ -7,7 +7,7 @@ from django.core.mail import send_mail  # Used to sent data to somebody via the 
 from taggit.models import Tag  # The taggable manager to allow us to list the tags next to each post (Page 61).
 from django.db.models import Count  # Used to start to recommend similar articles. The Count module contains the aggregations, such as Avg, Max, Min etc. (Page 64)
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank  # Used to search across fields.
-
+from django.contrib.postgres.search import TrigramSimilarity #  Used to check for instances of 3x matching chars
 
 # Create your views here.
 def post_list(request, tag_slug=None):
@@ -108,12 +108,19 @@ def post_search(request):
             query = form.cleaned_data['query']
             # search_vector = SearchVector('title', 'body')
             search_vector = SearchVector('title', weight='A') + SearchVector('body', weight='B') #  Added preference/weighting to the title over the body. 
-
             search_query = SearchQuery(query)
+
+            # The below logic returns based on the words searched for in the title and body
+            # results = Post.published.annotate(
+            #     search = search_vector,
+            #     rank=SearchRank(search_vector, search_query)
+            # ).filter(rank__gte=0.3).order_by('-rank') #   The default weights are D, C, B, and A, and they refer to the numbers 0.1, 0.2, 0.4, and 1.0, respectively. Here, we're returning only results with a score of 0.3 or higher.
+
+            # The below logic returns based on the prevelance of at least 3 chars in a row from searc hterm and title.
             results = Post.published.annotate(
-                search = search_vector,
-                rank=SearchRank(search_vector, search_query)
-            ).filter(rank__gte=0.3).order_by('-rank') #   The default weights are D, C, B, and A, and they refer to the numbers 0.1, 0.2, 0.4, and 1.0, respectively. Here, we're returning only results with a score of 0.3 or higher.
+                similarity=TrigramSimilarity('title', query),
+            ).filter(similarity__gt=0.1).order_by('-similarity')
+
     return render(request,
                 'blog/post/search.html',
                 {'form':form, 'query':query, 'results':results}
