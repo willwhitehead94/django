@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = 'dashboard' #  name of default URL to redirect to if login successful
 LOGIN_URL = 'login' #  name of default login URL if user is not already authenticated
 LOGOUT_URL = 'logout' #  name of default log out URL
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # Application definition
