@@ -134,6 +134,8 @@ AUTHENTICATION_BACKENDS = [
        'django.contrib.auth.backends.ModelBackend', # django default auth method (username based)
        'account.authenticate.EmailAuthBackend', # email based authentication (so we can accept user or email)
        'social_core.backends.facebook.FacebookOAuth2', # Facebook auth
+       'social_core.backends.twitter.TwitterOAuth', # Twitter
+
 ]
 
 SOCIAL_AUTH_FACEBOOK_KEY = '233512865243208' # Facebook App ID
