@@ -127,3 +127,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+AUTHENTICATION_BACKENDS = [
+       'django.contrib.auth.backends.ModelBackend', # django default auth method (username based)
+       'account.authenticate.EmailAuthBackend', # email based authentication (so we can accept user or email)
+]
