@@ -11,6 +11,7 @@ urlpatterns = [
 
     # user-based views
     path('register/', views.register, name='register'),
+    path('edit/', views.edit, name='edit_profile'),
     
     # password change views
     path('password_change/', auth_views.PasswordChangeView.as_view(), name ='password_change'),
