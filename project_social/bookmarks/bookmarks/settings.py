@@ -25,7 +25,7 @@ SECRET_KEY = 'f@+wd&zxg!0vo5!4s!6bji^2-rc6q-k2n+v(gk-#mctq-8&ivj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'mysite.com']
 
 # Development settings (as part of the Packt lesson)
 LOGIN_REDIRECT_URL = 'dashboard' #  name of default URL to redirect to if login successful
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+    'social_django',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
